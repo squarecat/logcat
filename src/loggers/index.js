@@ -88,19 +88,18 @@ const NodeLogger = function ({ index, client, name }) {
         format: winston.format.combine(filterDebug(), formatLog)
       })
     );
+    logger.add(
+      new ElasticsearchTransport({
+        level: 'debug',
+        index: client.__index,
+        transformer: nodeTransformer,
+        flushInterval: 5000,
+        bufferLimit: 200,
+        client
+      })
+    );
   }
 
-  console.log(`logging to index '${client.__index}'`);
-  logger.add(
-    new ElasticsearchTransport({
-      level: 'debug',
-      index: client.__index,
-      transformer: nodeTransformer,
-      flushInterval: 5000,
-      bufferLimit: 200,
-      client
-    })
-  );
   logger.warning = logger.warn;
   return logger;
 };
