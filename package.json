@@ -1,5 +1,5 @@
 {
-  "name": "squarecat-logger",
+  "name": "logcat",
   "version": "1.0.1",
   "description": "",
   "main": "src/index.js",
