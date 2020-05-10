@@ -12,3 +12,6 @@ logger.nodeLogger.info(
   '[service-c]: this is a log for service c with metadata',
   { extra: 'extra message', number: 10 }
 );
+logger.nodeLogger.debug(
+  '[debug]: this should only be logged with DEBUG=debug set'
+);

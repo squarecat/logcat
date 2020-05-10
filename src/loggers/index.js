@@ -1,6 +1,6 @@
 const winston = require('winston');
 const { ElasticsearchTransport } = require('winston-elasticsearch');
-
+const debug = require('debug');
 const nodeLogsMapping = require('./node-mapping');
 
 const formatLog = winston.format.printf(({ timestamp, level, message }) => {
@@ -8,6 +8,19 @@ const formatLog = winston.format.printf(({ timestamp, level, message }) => {
     return `${timestamp} ${level} ${JSON.stringify(message, null, 4)}`;
   }
   return `${timestamp} ${level} ${message}`;
+});
+
+const filterDebug = winston.format((log) => {
+  const { level, message } = log;
+
+  if (level !== 'debug' || debug.enabled('all')) return log;
+  if (!message || typeof message !== 'string') return log;
+
+  const matchDebug = message.match(/\[(.+)\]/);
+  if (!matchDebug || debug.enabled(matchDebug[1])) {
+    return log;
+  }
+  return false;
 });
 
 function nodeTransformer({ timestamp, level, message, meta }) {
@@ -46,6 +59,7 @@ const winstonOptions = {
     // always log to the console
     new winston.transports.Console({
       format: winston.format.combine(
+        filterDebug(),
         winston.format.colorize(),
         winston.format.simple(),
         formatLog
@@ -65,13 +79,13 @@ const NodeLogger = function ({ index, client, name }) {
       new winston.transports.File({
         filename: 'error.log',
         level: 'error',
-        format: formatLog
+        format: winston.format.combine(filterDebug(), formatLog)
       })
     );
     logger.add(
       new winston.transports.File({
         filename: 'combined.log',
-        format: formatLog
+        format: winston.format.combine(filterDebug(), formatLog)
       })
     );
   }
