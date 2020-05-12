@@ -102,7 +102,11 @@ const NodeLogger = function ({ index, client, name }) {
     }
   }
 
-  logger.warning = logger.warn;
+  if (!logger.warning) {
+    logger.warning = logger.warn;
+  } else if (!logger.warn) {
+    logger.warn = logger.warning;
+  }
   return logger;
 };
 

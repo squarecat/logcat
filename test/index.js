@@ -15,3 +15,6 @@ logger.nodeLogger.info(
 logger.nodeLogger.debug(
   '[debug]: this should only be logged with DEBUG=debug set'
 );
+
+logger.nodeLogger.warning('[warn]: this should be logged');
+logger.nodeLogger.warn('[warn]: this should be logged');
