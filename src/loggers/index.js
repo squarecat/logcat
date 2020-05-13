@@ -23,16 +23,32 @@ const filterDebug = winston.format((log) => {
   return false;
 });
 
-function nodeTransformer({ timestamp, level, message, meta }) {
+function nodeTransformer({ timestamp, level, message, meta: originalMeta }) {
   try {
     const name = this.client.__name;
-    const matchService = message.match(/^\[(.+)\]: (.*)/);
-    let service = 'none';
+    let meta = originalMeta || {};
     let m = message;
-    if (matchService) {
-      service = matchService[1];
-      m = matchService[2];
+    let service = 'unknown';
+    if (message !== 'string') {
+      if (message instanceof Error) {
+        m = message.message;
+        meta = {
+          ...meta,
+          stack: message.stack
+        };
+      } else if (message.toString() !== '[Object object]') {
+        m = message.toString;
+      } else {
+        return;
+      }
+    } else {
+      const matchService = m.match(/^\[(.+)\]: (.*)/);
+      if (matchService) {
+        service = matchService[1];
+        m = matchService[2];
+      }
     }
+
     return {
       '@timestamp': Date.now(),
       ingest_time: Date.now(),
