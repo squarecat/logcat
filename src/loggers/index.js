@@ -1,8 +1,9 @@
 const winston = require('winston');
-const { ElasticsearchTransport } = require('winston-elasticsearch');
+const { ElasticsearchTransport } = require('@squarecat/winston-elasticsearch');
 const debug = require('debug');
 const nodeLogsMapping = require('./node-mapping');
 
+winston.exitOnError = false;
 const formatLog = winston.format.printf(({ timestamp, level, message }) => {
   if (message.constructor === Object) {
     return `${timestamp} ${level} ${JSON.stringify(message, null, 4)}`;
@@ -90,7 +91,7 @@ const NodeLogger = function ({ index, client, name }) {
     levels: winston.config.syslog.levels,
     ...winstonOptions
   });
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV !== 'production') {
     logger.add(
       new winston.transports.File({
         filename: 'error.log',
@@ -105,16 +106,21 @@ const NodeLogger = function ({ index, client, name }) {
       })
     );
     if (client) {
-      logger.add(
-        new ElasticsearchTransport({
-          level: 'debug',
-          index: client.__index,
-          transformer: nodeTransformer,
-          flushInterval: 5000,
-          bufferLimit: 200,
-          client
-        })
-      );
+      const est = new ElasticsearchTransport({
+        level: 'debug',
+        index: client.__index,
+        transformer: nodeTransformer,
+        flushInterval: 5000,
+        bufferLimit: 200,
+        client,
+        handleExceptions: true,
+        handleRejections: true,
+        exitOnError: false
+      });
+      est.on('error', (err) => {
+        console.error(err.message);
+      });
+      logger.add(est);
     }
   }
 

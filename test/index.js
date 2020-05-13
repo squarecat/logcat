@@ -18,3 +18,5 @@ logger.nodeLogger.debug(
 
 logger.nodeLogger.warning('[warn]: this should be logged');
 logger.nodeLogger.warn('[warn]: this should be logged');
+
+logger.nodeLogger.debug(new Error('Logging an error'));
