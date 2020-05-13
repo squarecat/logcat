@@ -30,7 +30,7 @@ function nodeTransformer({ timestamp, level, message, meta: originalMeta }) {
     let meta = originalMeta || {};
     let m = message;
     let service = 'unknown';
-    if (message !== 'string') {
+    if (typeof message !== 'string') {
       if (message instanceof Error) {
         m = message.message;
         meta = {
@@ -91,7 +91,7 @@ const NodeLogger = function ({ index, client, name }) {
     levels: winston.config.syslog.levels,
     ...winstonOptions
   });
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV === 'production') {
     logger.add(
       new winston.transports.File({
         filename: 'error.log',
