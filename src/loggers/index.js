@@ -4,11 +4,15 @@ const debug = require('debug');
 const nodeLogsMapping = require('./node-mapping');
 
 winston.exitOnError = false;
-const formatLog = winston.format.printf(({ timestamp, level, message }) => {
+const formatLog = winston.format.printf(({ timestamp, level, message, stack }) => {
+  let msg = message;
   if (message.constructor === Object) {
-    return `${timestamp} ${level} ${JSON.stringify(message, null, 4)}`;
+    msg = JSON.stringify(message, null, 4);
   }
-  return `${timestamp} ${level} ${message}`;
+  if (stack) {
+    return `${timestamp} ${level} ${msg}\n${stack}`;
+  }
+  return `${timestamp} ${level} ${msg}`;
 });
 
 const filterDebug = winston.format((log) => {
