@@ -9,9 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@elastic/elasticsearch": "^7.6.1",
     "debug": "^4.1.1",
-    "winston": "^3.2.1",
-    "@squarecat/winston-elasticsearch": "git+https://github.com/squarecat/winston-elasticsearch.git#master"
+    "winston": "^3.2.1"
   }
 }
