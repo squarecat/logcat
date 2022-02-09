@@ -1,6 +1,8 @@
 const winston = require("winston");
 const debug = require("debug");
 
+const logPath = process.env.LOG_PATH || "/var/www/logs";
+
 winston.exitOnError = false;
 const formatLog = winston.format.printf(
   ({ timestamp, level, message, stack }) => {
@@ -71,8 +73,7 @@ const NodeLogger = function ({ name }) {
     );
     logger.add(
       new winston.transports.File({
-        filename: `/var/www/logs/${name}.log`,
-        filename: "combined.log",
+        filename: `${logPath}/${name}.log`,
         format: format.json(),
       })
     );
