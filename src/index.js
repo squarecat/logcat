@@ -1,7 +1,7 @@
 const { NodeLogger } = require("./loggers");
 
-function init({ name }) {
-  module.exports.nodeLogger = NodeLogger({ name });
+function init({ name, useDatadogTransport }) {
+  module.exports.nodeLogger = NodeLogger({ name, useDatadogTransport });
 }
 
 module.exports = {

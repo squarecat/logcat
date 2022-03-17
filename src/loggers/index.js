@@ -51,7 +51,7 @@ const winstonOptions = {
   ],
 };
 
-const NodeLogger = function ({ name }) {
+const NodeLogger = function ({ name, useDatadogTransport }) {
   const logger = winston.createLogger({
     level: "debug",
     levels: winston.config.syslog.levels,
@@ -74,9 +74,21 @@ const NodeLogger = function ({ name }) {
     logger.add(
       new winston.transports.File({
         filename: `${logPath}/${name}.log`,
-        format: format.json(),
+        format: winston.format.json(),
       })
     );
+  }
+
+  if (useDatadogTransport) {
+    if (!process.env.DATADOG_API_KEY) {
+      throw new Error("Set DATADOG_API_KEY to use datadog transport");
+    }
+    const httpTransportOptions = {
+      host: "http-intake.logs.datadoghq.com",
+      path: `/api/v2/logs?dd-api-key=${process.env.DATADOG_API_KEY}&ddsource=nodejs&service=${name}>`,
+      ssl: true,
+    };
+    logger.add(new winston.transports.Http(httpTransportOptions));
   }
 
   if (!logger.warning) {
