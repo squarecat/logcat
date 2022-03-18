@@ -87,6 +87,7 @@ const NodeLogger = function ({ name, useDatadogTransport }) {
       host: "http-intake.logs.datadoghq.com",
       path: `/api/v2/logs?dd-api-key=${process.env.DATADOG_API_KEY}&ddsource=nodejs&service=${name}>`,
       ssl: true,
+      format: winston.format.combine(filterAccountUuid()),
     };
     logger.add(new winston.transports.Http(httpTransportOptions));
   }
