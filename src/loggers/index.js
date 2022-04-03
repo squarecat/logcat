@@ -65,8 +65,9 @@ const NodeLogger = function ({ name, useDatadogTransport }) {
       datePattern: "YYYY-MM-DD",
       zippedArchive: false,
       createSymlink: true,
+      symlinkName: `${name}-current.log`,
       maxSize: "20m",
-      maxFiles: "14d",
+      maxFiles: "7d",
       format: winston.format.json(),
     })
   );
