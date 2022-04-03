@@ -61,7 +61,7 @@ const NodeLogger = function ({ name, useDatadogTransport }) {
 
   logger.add(
     new winston.transports.DailyRotateFile({
-      filename: `${logPath}/${name}-%DATE%.log`,
+      filename: `${logPath}/${name}/${name}-%DATE%.log`,
       datePattern: "YYYY-MM-DD",
       zippedArchive: false,
       createSymlink: true,
