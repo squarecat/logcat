@@ -1,5 +1,6 @@
 const winston = require("winston");
 const debug = require("debug");
+require("winston-daily-rotate-file");
 
 const logPath = process.env.LOG_PATH || "/var/www/logs";
 
@@ -57,27 +58,18 @@ const NodeLogger = function ({ name, useDatadogTransport }) {
     levels: winston.config.syslog.levels,
     ...winstonOptions,
   });
-  if (process.env.NODE_ENV === "production") {
-    logger.add(
-      new winston.transports.File({
-        filename: "error.log",
-        level: "error",
-        format: winston.format.combine(filterDebug(), formatLog),
-      })
-    );
-    logger.add(
-      new winston.transports.File({
-        filename: "combined.log",
-        format: winston.format.combine(filterDebug(), formatLog),
-      })
-    );
-    logger.add(
-      new winston.transports.File({
-        filename: `${logPath}/${name}.log`,
-        format: winston.format.json(),
-      })
-    );
-  }
+
+  logger.add(
+    new winston.transports.DailyRotateFile({
+      filename: `${logPath}/${name}-%DATE%.log`,
+      datePattern: "YYYY-MM-DD",
+      zippedArchive: false,
+      createSymlink: true,
+      maxSize: "20m",
+      maxFiles: "14d",
+      format: winston.format.json(),
+    })
+  );
 
   if (useDatadogTransport) {
     if (!process.env.DATADOG_API_KEY) {
