@@ -8,9 +8,9 @@ winston.exitOnError = false;
 const formatLog = winston.format.printf(
   ({ timestamp, level, message, stack }) => {
     let msg = message;
-    if (message.constructor === Object) {
+    try {
       msg = JSON.stringify(message, null, 4);
-    }
+    } catch {}
     if (stack) {
       return `${timestamp} ${level} ${msg}\n${stack}`;
     }
@@ -59,18 +59,20 @@ const NodeLogger = function ({ name, useDatadogTransport }) {
     ...winstonOptions,
   });
 
-  logger.add(
-    new winston.transports.DailyRotateFile({
-      filename: `${logPath}/${name}/${name}-%DATE%.log`,
-      datePattern: "YYYY-MM-DD",
-      zippedArchive: false,
-      createSymlink: true,
-      symlinkName: `${name}-current.log`,
-      maxSize: "20m",
-      maxFiles: "7d",
-      format: winston.format.json(),
-    })
-  );
+  if (!process.env.NO_LOG_TO_FILE) {
+    logger.add(
+      new winston.transports.DailyRotateFile({
+        filename: `${logPath}/${name}/${name}-%DATE%.log`,
+        datePattern: "YYYY-MM-DD",
+        zippedArchive: false,
+        createSymlink: true,
+        symlinkName: `${name}-current.log`,
+        maxSize: "20m",
+        maxFiles: "7d",
+        format: winston.format.json(),
+      })
+    );
+  }
 
   if (useDatadogTransport) {
     if (!process.env.DATADOG_API_KEY) {
