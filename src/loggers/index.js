@@ -3,6 +3,7 @@ const debug = require("debug");
 require("winston-daily-rotate-file");
 
 const logPath = process.env.LOG_PATH || "/var/www/logs";
+const logHistory = process.env.LOG_HISTORY || "3d";
 
 winston.exitOnError = false;
 const formatLog = winston.format.printf(
@@ -68,7 +69,7 @@ const NodeLogger = function ({ name, useDatadogTransport }) {
         createSymlink: true,
         symlinkName: `${name}-current.log`,
         maxSize: "20m",
-        maxFiles: "7d",
+        maxFiles: logHistory,
         format: winston.format.json(),
       })
     );
