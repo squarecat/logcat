@@ -9,9 +9,11 @@ winston.exitOnError = false;
 const formatLog = winston.format.printf(
   ({ timestamp, level, message, stack }) => {
     let msg = message;
-    try {
-      msg = JSON.stringify(message, null, 4);
-    } catch {}
+    if (typeof msg !== "string") {
+      try {
+        msg = JSON.stringify(msg, null, 4);
+      } catch {}
+    }
     if (stack) {
       return `${timestamp} ${level} ${msg}\n${stack}`;
     }
@@ -45,8 +47,9 @@ const winstonOptions = {
     new winston.transports.Console({
       format: winston.format.combine(
         filterDebug(),
-        winston.format.colorize(),
-        winston.format.simple(),
+        winston.format.timestamp({ format: "DD-MM-YYYY HH:mm:ss" }),
+        winston.format.errors({ stack: true }),
+        winston.format.colorize({ all: true }),
         formatLog
       ),
     }),
